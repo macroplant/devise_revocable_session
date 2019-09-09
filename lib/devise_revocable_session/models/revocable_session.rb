@@ -36,7 +36,7 @@ module Devise
         end
 
         def purge_old_sessions
-          revocable_sessions.order(created_at: :desc).offset(10).destroy_all
+          revocable_sessions.order(last_seen_at: :desc).offset(10).destroy_all
         end
 
         def mark_last_seen!(device_id)
