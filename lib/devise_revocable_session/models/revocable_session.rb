@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Devise
   module Models
     module RevocableSession
@@ -40,10 +42,15 @@ module Devise
         end
 
         def mark_last_seen!(device_id)
-          login_record = revocable_sessions.find_by(device_id: device_id)
-          #skip second to reduce database hit
-          if (Time.now - (login_record.last_seen_at)) >= 60
-            login_record.update_column :last_seen_at, Time.now
+          role = Rails.application.config.active_record.writing_role || :writing
+          ActiveRecord::Base.connected_to(role: role) do
+              ActiveRecord::Base.connection_handler.while_preventing_writes(false) do
+                login_record = revocable_sessions.find_by(device_id: device_id)
+                #skip second to reduce database hit
+                if (Time.now - (login_record.last_seen_at)) >= 60
+                login_record.update_column :last_seen_at, Time.now
+              end
+            end
           end
         end
 
