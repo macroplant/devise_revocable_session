@@ -37,6 +37,6 @@ Warden::Manager.before_logout do |record, warden, options|
   scope = options[:scope]
   if record && record.respond_to?(:has_revocable_sessions?) && record.has_revocable_sessions?
     record.deactivate_session!(warden.raw_session[:auth_id])
-    # warden.cookies.delete(:device_id)
+    warden.cookies.delete(:device_id)
   end
 end
