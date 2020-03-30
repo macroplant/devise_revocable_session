@@ -10,7 +10,8 @@ Warden::Manager.after_set_user except: :fetch do |record, warden, options|
     record.deactivate_session!(warden.raw_session[:auth_id])
     revocable_session = record.activate_session(warden.request)
     warden.raw_session[:auth_id] = revocable_session.session_id
-    warden.cookies[:device_id] = revocable_session.device_id
+    # warden.cookies[:device_id] = revocable_session.device_id
+    warden.cookies.permanent[:device_id] = revocable_session.device_id
   end
 end
 
@@ -36,6 +37,6 @@ Warden::Manager.before_logout do |record, warden, options|
   scope = options[:scope]
   if record && record.respond_to?(:has_revocable_sessions?) && record.has_revocable_sessions?
     record.deactivate_session!(warden.raw_session[:auth_id])
-    warden.cookies.delete(:device_id)
+    # warden.cookies.delete(:device_id)
   end
 end
