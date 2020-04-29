@@ -42,7 +42,7 @@ module Devise
         def mark_last_seen!(device_id)
           login_record = revocable_sessions.find_by(device_id: device_id)
           #skip second to reduce database hit
-          if (Time.now - (login_record.last_seen_at)) >= 60
+          if login_record.last_seen_at < 5.minutes.ago
             login_record.update_column :last_seen_at, Time.now
           end
         end
